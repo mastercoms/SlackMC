@@ -19,6 +19,10 @@ public class Slack extends JavaPlugin implements Listener {
     public void onEnable() {
         getLogger().info("Slack has been enabled.");
         getServer().getPluginManager().registerEvents(this, this);
+        this.saveDefaultConfig();
+        if (getConfig().getString("webhook").equals("https://hooks.slack.com/services/")) {
+            getLogger().severe("You have not set your webhook URL in the config!");
+        }
     }
 
     @Override
@@ -58,24 +62,24 @@ public class Slack extends JavaPlugin implements Listener {
                 getLogger().severe("You have not set your webhook URL in the config!");
             } else {
                 url = new URL(surl);
+                JSONObject j = new JSONObject();
+                j.put("text", m);
+                j.put("username", p);
+                j.put("icon_url", "https://minotar.net/avatar/" + p + "/100.png");
+                HttpURLConnection conn = (HttpURLConnection)url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                BufferedOutputStream bos = new BufferedOutputStream(conn.getOutputStream());
+                String body = "payload=" + j.toJSONString();
+                bos.write(body.getBytes("utf8"));
+                bos.flush();
+                bos.close();
+                int icode = conn.getResponseCode();
+                String opcode = Integer.toString(icode);
+                String code = conn.getResponseMessage();
+                getLogger().info(opcode + code);
+                conn.disconnect();
             }
-            JSONObject j = new JSONObject();
-            j.put("text", m);
-            j.put("username", p);
-            j.put("icon_url", "https://minotar.net/avatar/" + p + "/100.png");
-            HttpURLConnection conn = (HttpURLConnection)url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            BufferedOutputStream bos = new BufferedOutputStream(conn.getOutputStream());
-            String body = "payload=" + j.toJSONString();
-            bos.write(body.getBytes("utf8"));
-            bos.flush();
-            bos.close();
-            int icode = conn.getResponseCode();
-            String opcode = Integer.toString(icode);
-            String code = conn.getResponseMessage();
-            getLogger().info(opcode + code);
-            conn.disconnect();
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, e.getMessage());
         }
