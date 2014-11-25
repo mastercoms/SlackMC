@@ -24,8 +24,8 @@ public class Slack extends JavaPlugin implements Listener {
         getLogger().info("Slack has been enabled.");
         getServer().getPluginManager().registerEvents(this, this);
         this.saveDefaultConfig();
-        setWebhook = getConfig().getString("webhook").equals("https://hooks.slack.com/services/");
-        if (getConfig().getString("webhook").equals("https://hooks.slack.com/services/")) {
+        setWebhook = !getConfig().getString("webhook").equals("https://hooks.slack.com/services/");
+        if (!setWebhook) {
             getLogger().severe("You have not set your webhook URL in the config!");
         }
     }
@@ -65,7 +65,7 @@ public class Slack extends JavaPlugin implements Listener {
     }
 
     public void post(String b) {
-        if (setWebhook) {
+        if (!setWebhook) {
             getLogger().severe("You have not set your webhook URL in the config!");
         } else {
             try {
