@@ -1,3 +1,31 @@
 name: Slack
+version: 1.2.0
+description: Link your server to Slack!
+author: CircuitSoft
+website: https://circuitsoft.us
+
 main: us.circuitsoft.slack.Slack
-version: 1.1.0
+
+permissions:
+    slack.hide.command:
+        description: Does not post commands you do to Slack.
+        default: false
+    slack.reload:
+        description: Allows you to reload the plugin's config.
+    slack.hide.login:
+        description: Does not post to Slack when you login.
+        default: false
+    slack.hide.logout:
+        description: Does not post to Slack when you logout.
+        default: false
+    slack.hide.chat:
+        description: Does not post your chats to Slack.
+        default: false
+    slack.hide.*:
+        description: Does not post API events to Slack.
+        default: false
+commands:
+    slack:
+        description: Reloads the plugin's config.
+        permission: slack.reload
+        usage: Do /slack to reload the plugin's config.

@@ -1,1 +1,8 @@
+#The version. Do not touch this.
+version: 1.2.0
+#The incoming webhook URL you got from Slack.
 webhook: https://hooks.slack.com/services/
+#Commands that will not show up in Slack when they are executed.
+blacklist:
+    - /login
+    - /register

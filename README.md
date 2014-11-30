@@ -34,5 +34,5 @@ If you get an error, please post it to https://gist.github.com/ and then post th
 ##Donate
 [Donate with PayPal](https://www.paypal.com/cgi-bin/webscr?return=http%3A%2F%2Fdev.bukkit.org%2Fbukkit-plugins%2Fslack%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=circuitsoft%40outlook.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=http%3A%2F%2Fdev.bukkit.org%2Fbukkit-plugins%2Fslack%2F&lc=US&item_name=Slack+%28from+Bukkit.org%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD)
 
-##Source
-https://github.com/CircuitSoftGroup/SlackBukkit
+##Bukkit Dev
+http://dev.bukkit.org/bukkit-plugins/slack/
