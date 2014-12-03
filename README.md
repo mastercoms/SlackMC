@@ -34,17 +34,17 @@ _permission: slack.reload_
 
 ##Configuration
 **version** - the plugin's current version. Do not touch this.  
-**debug** - whether to post HTTP response codes to console
+**debug** - whether to post HTTP response codes to console  
 **webhook** - the incoming webhook URL for slack.  
-**use-perms** - whether to use permissions or not (for sending to Slack)
-**use-blacklist** - whether to use the command blacklist or not
+**use-perms** - whether to use permissions or not (for sending to Slack)  
+**use-blacklist** - whether to use the command blacklist or not  
 **blacklist** - list of commands you don't want to be sent to slack.  
 
 ##Permissions
 **slack.hide.command** - _does not post commands you do to Slack._  
 default: no one  
 
-**slack.reload** - _allows you to reload the plugin's config using the command **/slack**_
+**slack.reload** - _allows you to reload the plugin's config using the command **/slack**_  
 default: op  
 
 **slack.hide.login** - /_does not post to Slack when you login._  
