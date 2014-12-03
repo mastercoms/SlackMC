@@ -1,33 +1,32 @@
 package us.circuitsoft.slack;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.logging.Level;
+import java.util.List;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.json.simple.JSONObject;
 
 public class Slack extends JavaPlugin implements Listener {
 
     private boolean n;
+    private static String w;
+    private List<String> bl;
 
     @Override
     public void onEnable() {
         getLogger().info("Slack has been enabled.");
         getServer().getPluginManager().registerEvents(this, this);
-        updateConfig("1.2.0");
-        n = getConfig().getString("webhook").equals("https://hooks.slack.com/services/");
+        updateConfig("1.3.0");
+        w = getConfig().getString("webhook");
+        bl = getConfig().getStringList("blacklist");
+        n = w.equals("https://hooks.slack.com/services/");
         if (n) {
             getLogger().severe("You have not set your webhook URL in the config!");
         }
@@ -38,99 +37,48 @@ public class Slack extends JavaPlugin implements Listener {
         getLogger().info("Slack has been disabled!");
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event) {
         if (permCheck("slack.hide.chat", event.getPlayer())) {
             payload('"' + event.getMessage() + '"', event.getPlayer().getName());
         }
     }
 
-    @EventHandler
-    public void onLogin(PlayerLoginEvent event) {
-        if (permCheck("slack.hide.logout", event.getPlayer())) {
+    @EventHandler (priority = EventPriority.MONITOR)
+    public void onLogin(PlayerJoinEvent event) {
+        if(permCheck("slack.hide.login", event.getPlayer())) {
             payload("logged in", event.getPlayer().getName());
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
         if(permCheck("slack.hide.logout", event.getPlayer())) {
             payload("logged out", event.getPlayer().getName());
         }
     }
 
-    @EventHandler
+    @EventHandler (priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
         if (blacklist(event.getMessage()) && permCheck("slack.hide.command", event.getPlayer())) {
             payload(event.getMessage(), event.getPlayer().getName());
         }
     }
 
-    /**
-     * Send a message to Slack.
-     * @param m The message sent to Slack.
-     * @param p The name of the sender of the message sent to Slack.
-     * @return True if the message was successfully sent to Slack.
-     */
-    public boolean payload(String m, String p) {
-        JSONObject j = new JSONObject();
-        j.put("text", p + ": " + m);
-        j.put("username", p);
-        j.put("icon_url", "https://cravatar.eu/helmhead/" + p + "/100.png");
-        String b = "payload=" + j.toJSONString();
-        return post(b);
-    }
-    
-    /**
-     * Send a message to Slack with a custom user icon.
-     * @param m The message sent to Slack.
-     * @param p The name of the sender of the message sent to Slack.
-     * @param i The URL of an image of the sender of the message sent to Slack. (recommended for non player messages).
-     * @return True if the message was successfully sent to Slack.
-     */
-    public boolean payload(String m, String p, String i) {
-        if(permCheck("slack.hide.*", getServer().getPlayer(p))) {
-            JSONObject j = new JSONObject();
-            j.put("text", p + ": " + m);
-            j.put("username", p);
-            j.put("icon_url", i);
-            String b = "payload=" + j.toJSONString();
-            return post(b);
-        } else {
-            return false;
-        }
+    public void payload(String m, String p) {
+           new Poster(this, m, p, w, null).runTaskAsynchronously(this);
     }
 
-    private boolean post(String b) {
-        int i = 0;
-        if (n) {
-            getLogger().severe("You have not set your webhook URL in the config!");
-        } else {
-            try {
-                URL u = new URL(getConfig().getString("webhook"));
-                HttpURLConnection C = (HttpURLConnection)u.openConnection();
-                C.setRequestMethod("POST");
-                C.setDoOutput(true);
-                try (BufferedOutputStream B = new BufferedOutputStream(C.getOutputStream())) {
-                    B.write(b.getBytes("utf8"));
-                    B.flush();
-                }
-                i = C.getResponseCode();
-                String o = Integer.toString(i);
-                String c = C.getResponseMessage();
-                getLogger().log(Level.INFO, "{0} {1}", new Object[]{o, c});
-                C.disconnect();
-                } catch (MalformedURLException e) {
-                    getLogger().log(Level.SEVERE, "URL is not valid: ", e);
-                } catch (IOException e) {
-                    getLogger().log(Level.SEVERE, "IO exception: ", e);
-                }
-        }
-        return i == 200;
+    public void payload(String m, String p, String i) {
+           new Poster(this, m, p, w, i).runTaskAsynchronously(this);
     }
 
     private boolean blacklist(String m) {
-        return !getConfig().getStringList("blacklist").contains(m);
+        if (getConfig().getBoolean("use-blacklist")) {
+            return !bl.contains(m);
+        } else {
+            return true;
+        }
     }
 
     private void updateConfig(String v) {
@@ -143,13 +91,19 @@ public class Slack extends JavaPlugin implements Listener {
     }
 
     private boolean permCheck(String c, Player p) {
-        return !p.hasPermission(c);
+        if (getConfig().getBoolean("use-perms")) {
+            return !p.hasPermission(c);
+        } else {
+            return true;
+        }
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("slack")) {
             this.reloadConfig();
+            w = getConfig().getString("webhook");
+            bl = getConfig().getStringList("blacklist");
             sender.sendMessage("Slack has been reloaded.");
             if (sender.getName() == null ? getServer().getConsoleSender().getName() != null : !sender.getName().equals(getServer().getConsoleSender().getName())) {
                 getServer().getConsoleSender().sendMessage("Slack has been reloaded.");
@@ -158,4 +112,5 @@ public class Slack extends JavaPlugin implements Listener {
         }
         return false;
     }
+    
 }

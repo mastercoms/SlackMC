@@ -1,7 +1,13 @@
 #The version. Do not touch this.
-version: 1.2.0
+version: 1.3.0
 #The incoming webhook URL you got from Slack.
 webhook: https://hooks.slack.com/services/
+#Show HTTP response codes in console
+debug: false
+#Causes a bit of lag but you can hvae certain players not post to Slack
+use-perms: false
+#Causes lag but you can block commands from being shown to Slack
+use-blacklist: false
 #Commands that will not show up in Slack when they are executed.
 blacklist:
     - /login

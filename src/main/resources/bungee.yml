@@ -1,0 +1,4 @@
+name: Slack
+main: us.circuitsoft.slack.bungee.Slack
+version: 1.3.0
+author: CircuitSoft
