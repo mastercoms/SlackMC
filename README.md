@@ -15,12 +15,9 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * Send commands from Slack (coming soon)
 
 ##Download
-[[http://dev.bukkit.org/bukkit-plugins/slack/files/|Stable builds]]  
+[Stable builds](http://dev.bukkit.org/bukkit-plugins/slack/files/)  
 
-**Development builds of this project can be acquired at the provided continuous integration server. 
-These builds have not been approved by the BukkitDev staff. Use them at your own risk.**  
-
-[[https://github.com/CircuitSoftGroup/SlackBukkit/releases|Dev builds]]
+[Dev builds](https://github.com/CircuitSoftGroup/SlackBukkit/releases)
 
 ##Installation
 # Drop the plugin in your server folder.
@@ -77,7 +74,7 @@ If you get an error, please post it to https://gist.github.com/ and then post th
 If you have a feature request, PM me, or code it yourself and pull request it on Github.
 
 ##Give Me Money
-[[https://www.paypal.com/cgi-bin/webscr?return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=circuitsoft%40outlook.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&lc=US&item_name=Slack+%28from+GitHub.com%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD|Give me money with PayPal]]
+[Give me money with PayPal](https://www.paypal.com/cgi-bin/webscr?return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=circuitsoft%40outlook.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&lc=US&item_name=Slack+%28from+GitHub.com%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD)
 
 ##Bukkit Dev
 http://dev.bukkit.org/bukkit-plugins/slack/
