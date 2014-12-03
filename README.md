@@ -3,9 +3,7 @@
 Slack
 ===========
 
-Bukkit plugin for [Slack](https://slack.com)
-
-Link your server to [Slack](https://slack.com)!
+Spigot/CraftBukkit/Bukkit/BungeeCord/ plugin for [Slack](https://slack.com)
 
 ##Features
 
