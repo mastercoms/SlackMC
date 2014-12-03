@@ -57,7 +57,7 @@ default: no one
 default: no one  
 
 ##API
-**(not implemented yet)**
+**(not implemented yet)**  
 Just 
 ```java
 import static us.circuitsoft.slack.send
