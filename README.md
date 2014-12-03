@@ -20,11 +20,11 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 [Dev builds](https://github.com/CircuitSoftGroup/SlackBukkit/releases)
 
 ##Installation
-# Drop the plugin in your server folder.
-# Create a new incoming webhook and set it up however you would like.
-# Start and stop the server.
-# Copy the webhook URL and set webhook: in the config.yml to that.
-# Start the server.
+1. Drop the plugin in your server folder.
+2. Create a new incoming webhook and set it up however you would like.
+3. Start and stop the server.
+4. Copy the webhook URL and set webhook: in the config.yml to that.
+5. Start the server.
 
 Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Probably works with any Bukkit API server.
 
