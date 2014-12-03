@@ -58,7 +58,11 @@ default: no one
 
 ##API
 **(not implemented yet)**
-Just _import static us.circuitsoft.slack.send_ into your plugin and add the plugin as a dependency. 
+Just 
+```java
+import static us.circuitsoft.slack.send
+```
+into your plugin and add the plugin as a dependency. 
 
 The method to send a message to Slack is send(). Javadocs are included in the plugin about parameters. 
 
