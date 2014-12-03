@@ -3,10 +3,7 @@ Slack
 
 Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 
-== Slack ==
-Link your server to [[https://slack.com|Slack]]!
-
-=== Features ===
+##Features
 * Send chat messages and commands to Slack
 * Send login and quit messages to Slack
 * Uses minecraft username and avatar as bot information
@@ -14,6 +11,8 @@ Link your server to [[https://slack.com|Slack]]!
 * Use permissions to block messages to Slack
 * API to send custom events (coming soon)
 * BungeeCord support (coming soon)
+* See the console (coming soon)
+* Send commands from Slack (coming soon)
 
 ##Download
 [[http://dev.bukkit.org/bukkit-plugins/slack/files/|Stable builds]]  
