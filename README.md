@@ -12,6 +12,7 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * API to send custom events (coming soon)
 * BungeeCord support (coming soon)
 * See the console (coming soon)
+* Formatting (coming soon)
 * Send commands from Slack (coming soon)
 
 ##Download
