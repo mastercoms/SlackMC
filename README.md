@@ -9,8 +9,8 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * Uses minecraft username and avatar as bot information
 * Blacklist players or commands from being sent to Slack
 * Use permissions to block messages to Slack
-* API to send custom events (coming soon)
-* BungeeCord support (coming soon)
+* API to send custom messages
+* BungeeCord support (partial)
 * See the console (coming soon)
 * Formatting (coming soon)
 * Send commands from Slack (coming soon)
@@ -57,17 +57,27 @@ default: no one
 **slack.hide.chat** - _does not post your chats to Slack._  
 default: no one  
 
-##API
-**(not implemented yet)**  
-Just 
+##Custom Messages
+On the server, you may use  
+**/slack send <username> <image URL> <message>**  
+to send a custom message to Slack.
+
+Programmatically, you can add the plugin as a dependency, and then import the API for the platform you're using (either Bukkit or BungeeCord)
 ```java
-import static us.circuitsoft.slack.send
+import us.circuitsoft.slack.api.BukkitPoster
 ```
-into your plugin and add the plugin as a dependency. 
+or
+```java
+import us.circuitsoft.slack.api.BungeePoster
+```
 
-The method to send a message to Slack is send(). Javadocs are included in the plugin about parameters. 
+If you're using Bukkit, 
+```java
+new BukkitPoster(m, p, i).runTaskAsynchronously(this);
+```
+where m is the message, p is the username, and i is the image URL. You can set i to null if p is a Minecraft player username.
 
-The method returns true if the message was successfully sent to Slack, so you might want to do something if it returns false.
+If you're using BungeeCord, make a thread with the task BungeePoster. Same parameters as Bukkit.
 
 ##Support
 For support questions on how to use the plugin and troubleshooting, post a comment so if I am not available, other people can help you. Explain your problem and use the latest version before asking for help.
