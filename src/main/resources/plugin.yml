@@ -1,17 +1,17 @@
 name: Slack
-version: 1.3.0
+version: 1.4.0
 description: Link your server to Slack!
 author: CircuitSoft
 website: https://circuitsoft.us
 
-main: us.circuitsoft.slack.Slack
+main: us.circuitsoft.slack.bukkit.SlackBukkit
 
 permissions:
     slack.hide.command:
         description: Does not post commands you do to Slack.
         default: false
-    slack.reload:
-        description: Allows you to reload the plugin's config.
+    slack.commands:
+        description: Allows you to have access to Slack commands.
     slack.hide.login:
         description: Does not post to Slack when you login.
         default: false
@@ -23,6 +23,6 @@ permissions:
         default: false
 commands:
     slack:
-        description: Reloads the plugin's config.
-        permission: slack.reload
-        usage: Do /slack to reload the plugin's config.
+        description: Slack commands.
+        permission: slack.command
+        usage: Do /slack for a list of Slack's commands.
