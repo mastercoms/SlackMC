@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.logging.Level;
+
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -81,8 +82,8 @@ public class SlackBungee extends Plugin implements Listener {
         send(message, name, null);
     }
 
-    public void send(String m, String p, String i) {
-        getProxy().getScheduler().runAsync(this, new SlackBungeePoster(this, con, m, p, i));
+    public void send(String message, String name, String iconUrl) {
+        getProxy().getScheduler().runAsync(this, new SlackBungeePoster(this, config, message, name, iconUrl));
     }
 
     private boolean isOnBlacklist(String name) {

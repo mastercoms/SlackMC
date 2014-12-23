@@ -38,7 +38,6 @@ public class SlackBungeeCommand extends Command {
             } else {
                 sender.sendMessage(noPermMsg);
             }
-            plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(m, strings[1], strings[2]));
         } else if (args[0].equals("send")) {
             if (sender.hasPermission("slack.send")) {
                 if (args.length <= 3) {
