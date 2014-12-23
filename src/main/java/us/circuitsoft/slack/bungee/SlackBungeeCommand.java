@@ -1,7 +1,5 @@
 package us.circuitsoft.slack.bungee;
 
-import java.util.concurrent.Executors;
-
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
@@ -40,6 +38,7 @@ public class SlackBungeeCommand extends Command {
             } else {
                 sender.sendMessage(noPermMsg);
             }
+            plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(m, strings[1], strings[2]));
         } else if (args[0].equals("send")) {
             if (sender.hasPermission("slack.send")) {
                 if (args.length <= 3) {
