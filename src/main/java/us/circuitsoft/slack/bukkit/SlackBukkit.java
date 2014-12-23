@@ -1,9 +1,11 @@
 package us.circuitsoft.slack.bukkit;
 
 import java.util.List;
+
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -16,19 +18,17 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class SlackBukkit extends JavaPlugin implements Listener {
 
-    private boolean n;
-    private static String w;
-    private List<String> bl;
+    private static String webhookUrl;
+    private List<String> blacklist;
 
     @Override
     public void onEnable() {
         getLogger().info("Slack has been enabled.");
         getServer().getPluginManager().registerEvents(this, this);
-        updateConfig(this.getDescription().getVersion());
-        w = getConfig().getString("webhook");
-        bl = getConfig().getStringList("blacklist");
-        n = w.equals("https://hooks.slack.com/services/");
-        if (n || w == null) {
+        updateConfig(getDescription().getVersion());
+        webhookUrl = getConfig().getString("webhook");
+        blacklist = getConfig().getStringList("blacklist");
+        if (webhookUrl == null || webhookUrl.trim().isEmpty() || webhookUrl.equals("https://hooks.slack.com/services/")) {
             getLogger().severe("You have not set your webhook URL in the config!");
         }
     }
@@ -40,97 +40,110 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event) {
-        if (permCheck("slack.hide.chat", event.getPlayer())) {
+        if (!hasPermission("slack.hide.chat", event.getPlayer())) {
             send('"' + event.getMessage() + '"', event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerJoinEvent event) {
-        if (permCheck("slack.hide.login", event.getPlayer())) {
+        if (!hasPermission("slack.hide.login", event.getPlayer())) {
             send("logged in", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        if (permCheck("slack.hide.logout", event.getPlayer())) {
+        if (!hasPermission("slack.hide.logout", event.getPlayer())) {
             send("logged out", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (blacklist(event.getMessage()) && permCheck("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
+        if (!isOnBlacklist(event.getMessage()) && !hasPermission("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
             send(event.getMessage(), event.getPlayer().getName());
         }
     }
 
-    public void send(String m, String p) {
-        new SlackBukkitPoster(this, m, p, null).runTaskAsynchronously(this);
+    public void send(String message, String name) {
+        new SlackBukkitPoster(this, message, name, null).runTaskAsynchronously(this);
     }
 
-    public void send(String m, String p, String i) {
-        new SlackBukkitPoster(this, m, p, i).runTaskAsynchronously(this);
+    public void send(String message, String name, String iconUrl) {
+        new SlackBukkitPoster(this, message, name, iconUrl).runTaskAsynchronously(this);
     }
 
-    private boolean blacklist(String m) {
+    private boolean isOnBlacklist(String name) {
         if (getConfig().getBoolean("use-blacklist")) {
-            return !bl.contains(m);
+            return blacklist.contains(name);
         } else {
-            return true;
+            return false;
         }
     }
 
-    private void updateConfig(String v) {
+    private void updateConfig(String version) {
         this.saveDefaultConfig();
-        if (getConfig().getString("v") == null ? v != null : !getConfig().getString("v").equals(v)) {
-            getConfig().options().copyDefaults(true);
-            getConfig().set("version", v);
-        }
-        this.saveConfig();
+        getConfig().options().copyDefaults(true);
+        getConfig().set("version", version);
+        saveConfig();
     }
 
-    private boolean permCheck(String c, Player p) {
+    private boolean hasPermission(String permission, Player player) {
         if (getConfig().getBoolean("use-perms")) {
-            return !p.hasPermission(c);
+            return player.hasPermission(permission);
         } else {
-            return true;
+            return false;
         }
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        if (cmd.getName().equalsIgnoreCase("slack")) {
-            if (args.length == 0) {
-                sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL> <message> - send a custom message to slack \n/slack reload - reload Slack's config");
-                return true;
-            }
-            if (args[0].equals("reload")) {
-                this.reloadConfig();
-                w = getConfig().getString("webhook");
-                bl = getConfig().getStringList("blacklist");
-                sender.sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
-                if (sender.getName() == null ? getServer().getConsoleSender().getName() != null : !sender.getName().equals(getServer().getConsoleSender().getName())) {
-                    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
-                }
-                return true;
-            } else if (args[0].equals("send") && args.length <= 3) {
-                sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL> <message>");
-                return true;
-            } else if (args[0].equals("send") && args.length >= 4) {
-                String m = "";
-                for (int i = 3; i < args.length; i++) {
-                    m = m + args[i] + " ";
-                }
-                send(m, args[1], args[2]);
-                return true;
-            }
+        if (!cmd.getName().equalsIgnoreCase("slack")) {
+            return false;
         }
-        return false;
+        if (!sender.hasPermission("slack.reload") && sender.hasPermission("slack.send")) {
+            sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
+        } else if (args.length == 0) {
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack \n/slack reload - reload Slack's config");
+        } else if (args[0].equalsIgnoreCase("reload")) {
+            if (sender.hasPermission("slack.reload")) {
+                reloadConfig();
+                webhookUrl = getConfig().getString("webhook");
+                blacklist = getConfig().getStringList("blacklist");
+                sender.sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
+                if (!(sender instanceof ConsoleCommandSender)) {
+                    getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "Slack has been reloaded by " + sender.getName() + '.');
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
+            }
+        } else if (args[0].equalsIgnoreCase("send")) {
+            if (sender.hasPermission("slack.send")) {
+                if (args.length <= 3) {
+                    sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message>");
+                } else if (args.length >= 4) {
+                    StringBuilder sb = new StringBuilder();
+                    boolean first = true;
+                    for (int i = 3; i < args.length; i++) {
+                        if (first) {
+                            sb.append(" ");
+                            first = false;
+                        }
+                        sb.append(args[i]);
+                    }
+                    send(sb.toString(), args[1], args[2].equalsIgnoreCase("null") ? null : args[2]);
+                }
+            } else {
+                sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
+            }
+        } else {
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack \n/slack reload - reload Slack's config");
+        }
+        return true;
     }
 
-    public static String getWebhook() {
-        return w;
+    public static String getWebhookUrl() {
+        return webhookUrl;
     }
 }

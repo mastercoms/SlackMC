@@ -16,7 +16,7 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * Send commands from Slack (coming soon)
 
 ##Download
-[Stable builds](http://dev.bukkit.org/bukkit-plugins/slack/files/)  
+[Stable builds](http://dev.bukkit.org/bukkit-plugins/slack/files/)
 
 [Dev builds](https://github.com/CircuitSoftGroup/SlackBukkit/releases)
 
@@ -30,37 +30,41 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Probably works with any Bukkit API server.
 
 ##Commands
-**/slack** - reloads the config
-_permission: slack.reload_
+**/slack** - reloads the config or sends a message
+_permission: slack.reload or slack.send_
 
 ##Configuration
-**version** - the plugin's current version. Do not touch this.  
-**debug** - whether to post HTTP response codes to console  
-**webhook** - the incoming webhook URL for slack.  
-**use-perms** - whether to use permissions or not (for sending to Slack)  
-**use-blacklist** - whether to use the command blacklist or not  
-**blacklist** - list of commands you don't want to be sent to slack.  
+**version** - the plugin's current version. Do not touch this.
+**debug** - whether to post HTTP response codes to console
+**webhook** - the incoming webhook URL for slack.
+**use-perms** - whether to use permissions or not (for sending to Slack)
+**use-blacklist** - whether to use the command blacklist or not
+**blacklist** - list of commands you don't want to be sent to slack.
 
 ##Permissions
-**slack.hide.command** - _does not post commands you do to Slack._  
-default: no one  
+**slack.hide.command** - _does not post commands you do to Slack._
+default: no one
 
-**slack.reload** - _allows you to reload the plugin's config using the command **/slack**_  
-default: op  
+**slack.reload** - _allows you to reload the plugin's config using the command **/slack reload**_
+default: op
 
-**slack.hide.login** - /_does not post to Slack when you login._  
-default: no one  
+**slack.send** - _allows you to send a custom message using the command **/slack** as explained below_
+default: op
 
-**slack.hide.logout** - _does not post to Slack when you login._  
-default: no one  
+**slack.hide.login** - /_does not post to Slack when you login._
+default: no one
 
-**slack.hide.chat** - _does not post your chats to Slack._  
-default: no one  
+**slack.hide.logout** - _does not post to Slack when you login._
+default: no one
+
+**slack.hide.chat** - _does not post your chats to Slack._
+default: no one
 
 ##Custom Messages
-On the server, you may use  
-**/slack send <username> <image URL> <message>**  
+On the server, you may use
+**/slack send <username> <image URL> <message>**
 to send a custom message to Slack.
+You can use **null** as image URL to use the username's minecraft head skin.
 
 Programmatically, you can add the plugin as a dependency, and then import the API for the platform you're using (either Bukkit or BungeeCord)
 ```java
@@ -71,13 +75,13 @@ or
 import us.circuitsoft.slack.api.BungeePoster
 ```
 
-If you're using Bukkit, 
+If you're using Bukkit,
 ```java
-new BukkitPoster(m, p, i).runTaskAsynchronously(this);
+new BukkitPoster(message, name, iconUrl).runTaskAsynchronously(this);
 ```
-where m is the message, p is the username, and i is the image URL. You can set i to null if p is a Minecraft player username.
+where message is the message (!), name is the username, and iconUrl is the image URL. You can set iconUrl to null if name is a Minecraft player username, it will then use the pleayer's skin head.
 
-If you're using BungeeCord, make a thread with the task BungeePoster. Same parameters as Bukkit.
+If you're using BungeeCord, schedule a new BungeePoster instance asnychronous. Same parameters as in the Bukkit version.
 
 ##Support
 For support questions on how to use the plugin and troubleshooting, post a comment so if I am not available, other people can help you. Explain your problem and use the latest version before asking for help.
@@ -88,7 +92,7 @@ If you get an error, please post it to https://gist.github.com/ and then post th
 
 If you have a feature request, PM me, or code it yourself and pull request it on Github.
 
-##Give Me Money
+##Donate to me
 [Give me money with PayPal](https://www.paypal.com/cgi-bin/webscr?return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&cn=Add+special+instructions+to+the+addon+author%28s%29&business=circuitsoft%40outlook.com&bn=PP-DonationsBF%3Abtn_donateCC_LG.gif%3ANonHosted&cancel_return=https%3A%2F%2Fgithub.com%2FCircuitSoftGroup%2FSlackMC%2F&lc=US&item_name=Slack+%28from+GitHub.com%29&cmd=_donations&rm=1&no_shipping=1&currency_code=USD)
 
 ##Bukkit Dev

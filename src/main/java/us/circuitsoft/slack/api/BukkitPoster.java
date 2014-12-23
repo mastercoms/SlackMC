@@ -3,54 +3,57 @@ package us.circuitsoft.slack.api;
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
-import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhook;
+
+import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
  * Posts a message to Slack when using Bukkit.
  */
 public class BukkitPoster extends BukkitRunnable {
 
-    private final String p;
-    private final String m;
-    private final String w;
-    private final String i;
+    private final String name;
+    private final String message;
+    private final String webhookUrl = getWebhookUrl();
+    private final String iconUrl;
 
     /**
      * Prepares the message to send to Slack.
-     * @param m The message to send to Slack.
-     * @param p The username of the message to send to Slack.
-     * @param i The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
+     *
+     * @param message The message to send to Slack.
+     * @param name    The username of the message to send to Slack.
+     * @param iconUrl The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
      */
-    public BukkitPoster (String m, String p, String i) {
-        this.p = p;
-        this.m = m;
-        this.i = i;
-        this.w = getWebhook();
+    public BukkitPoster(String message, String name, String iconUrl) {
+        this.name = name;
+        this.message = message;
+        this.iconUrl = iconUrl;
     }
-            
+
     @Override
     public void run() {
-        JSONObject j = new JSONObject();
-        j.put("text", p + ": " + m);
-        j.put("username", p);
-        if (i == null) {
-            j.put("icon_url", "https://cravatar.eu/helmhead/" + p + "/100.png");   
+        JSONObject json = new JSONObject();
+        json.put("text", name + ": " + message);
+        json.put("username", name);
+        if (iconUrl == null) {
+            json.put("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
         } else {
-            j.put("icon_url", i);
+            json.put("icon_url", iconUrl);
         }
-        String b = "payload=" + j.toJSONString();
-            try {
-                URL u = new URL(w);
-                HttpURLConnection C = (HttpURLConnection)u.openConnection();
-                C.setRequestMethod("POST");
-                C.setDoOutput(true);
-                try (BufferedOutputStream B = new BufferedOutputStream(C.getOutputStream())) {
-                    B.write(b.getBytes("utf8"));
-                    B.flush();
-                }
-                C.disconnect();
-                } catch (Exception e) {}
+        String jsonStr = "payload=" + json.toJSONString();
+        try {
+            HttpURLConnection webhookConnection = (HttpURLConnection) new URL(webhookUrl).openConnection();
+            webhookConnection.setRequestMethod("POST");
+            webhookConnection.setDoOutput(true);
+            try (BufferedOutputStream bufOut = new BufferedOutputStream(webhookConnection.getOutputStream())) {
+                bufOut.write(jsonStr.getBytes(StandardCharsets.UTF_8));
+                bufOut.flush();
+            }
+            webhookConnection.disconnect();
+        } catch (Exception ignored) {
+        }
     }
 }

@@ -6,10 +6,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
+
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
-import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhook;
+
+import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
  * Poster for Slack plugin's internal use. Do not use this.
@@ -17,45 +19,43 @@ import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhook;
 public class SlackBukkitPoster extends BukkitRunnable {
 
     private final JavaPlugin plugin;
-    private final String p;
-    private final String m;
-    private final String w = getWebhook();
-    private final String i;
+    private final String name;
+    private final String message;
+    private final String webhookUrl = getWebhookUrl();
+    private final String iconUrl;
 
-    public SlackBukkitPoster(JavaPlugin plugin, String m, String p, String i) {
+    public SlackBukkitPoster(JavaPlugin plugin, String message, String name, String iconUrl) {
         this.plugin = plugin;
-        this.p = p;
-        this.m = m;
-        this.i = i;
+        this.name = name;
+        this.message = message;
+        this.iconUrl = iconUrl;
     }
 
     @Override
     public void run() {
-        int res;
-        JSONObject j = new JSONObject();
-        j.put("text", p + ": " + m);
-        j.put("username", p);
-        if (i == null) {
-            j.put("icon_url", "https://cravatar.eu/helmhead/" + p + "/100.png");
+        JSONObject json = new JSONObject();
+        json.put("text", name + ": " + message);
+        json.put("username", name);
+        if (iconUrl == null) {
+            json.put("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
         } else {
-            j.put("icon_url", i);
+            json.put("icon_url", iconUrl);
         }
-        String b = "payload=" + j.toJSONString();
+        String b = "payload=" + json.toJSONString();
         try {
-            URL u = new URL(w);
-            HttpURLConnection C = (HttpURLConnection) u.openConnection();
-            C.setRequestMethod("POST");
-            C.setDoOutput(true);
-            try (BufferedOutputStream B = new BufferedOutputStream(C.getOutputStream())) {
-                B.write(b.getBytes("utf8"));
-                B.flush();
+            HttpURLConnection webhookConnection = (HttpURLConnection) new URL(webhookUrl).openConnection();
+            webhookConnection.setRequestMethod("POST");
+            webhookConnection.setDoOutput(true);
+            try (BufferedOutputStream bufOut = new BufferedOutputStream(webhookConnection.getOutputStream())) {
+                bufOut.write(b.getBytes("utf8"));
+                bufOut.flush();
             }
-            C.disconnect();
-            res = C.getResponseCode();
-            String o = Integer.toString(res);
-            String c = C.getResponseMessage();
+            webhookConnection.disconnect();
             if (plugin.getConfig().getBoolean("debug")) {
-                plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{o, c});
+                plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{
+                        webhookConnection.getResponseCode(),
+                        webhookConnection.getResponseMessage()
+                });
             }
         } catch (MalformedURLException e) {
             plugin.getLogger().log(Level.SEVERE, "URL is not valid: ", e);
