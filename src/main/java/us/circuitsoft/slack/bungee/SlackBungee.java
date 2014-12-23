@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -30,7 +29,7 @@ public class SlackBungee extends Plugin implements Listener {
         con = null;
         getLogger().info("Slack has been enabled!");
         getProxy().getPluginManager().registerListener(this, this);
-        getProxy().getPluginManager().registerCommand(this, new SlackBungeeCommand());
+        getProxy().getPluginManager().registerCommand(this, new SlackBungeeCommand(this));
         try {
             con = ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(getDataFolder(), "config.yml"));
         } catch (IOException ex) {
@@ -72,11 +71,11 @@ public class SlackBungee extends Plugin implements Listener {
     }
 
     public void send(String m, String p) {
-        Executors.newSingleThreadExecutor().submit(new SlackBungeePoster(this, con, m, p, null));
+        getProxy().getScheduler().runAsync(this, new SlackBungeePoster(this, con, m, p, null));
     }
 
     public void send(String m, String p, String i) {
-        Executors.newSingleThreadExecutor().submit(new SlackBungeePoster(this, con, m, p, i));
+        getProxy().getScheduler().runAsync(this, new SlackBungeePoster(this, con, m, p, i));
     }
 
     private boolean blacklist(String m) {

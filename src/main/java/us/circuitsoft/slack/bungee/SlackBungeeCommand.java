@@ -1,6 +1,5 @@
 package us.circuitsoft.slack.bungee;
 
-import java.util.concurrent.Executors;
 import net.md_5.bungee.api.ChatColor;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.ComponentBuilder;
@@ -9,8 +8,11 @@ import us.circuitsoft.slack.api.BungeePoster;
 
 public class SlackBungeeCommand extends Command {
 
-    public SlackBungeeCommand() {
+    private final SlackBungee plugin;
+
+    public SlackBungeeCommand(SlackBungee plugin) {
         super("slack");
+        this.plugin = plugin;
     }
 
     @Override
@@ -25,7 +27,7 @@ public class SlackBungeeCommand extends Command {
             for (int i = 3; i < strings.length; i++) {
                 m = m + strings[i] + " ";
             }
-            Executors.newSingleThreadExecutor().submit(new BungeePoster(m, strings[1], strings[2]));
+            plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(m, strings[1], strings[2]));
         }
     }
 }
