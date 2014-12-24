@@ -1,7 +1,7 @@
 Slack
 ===========
 
-Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
+Spigot/CraftBukkit/Bukkit/BungeeCord/Glowstone plugin for [Slack](https://slack.com)
 
 ##Features
 * Send chat messages and commands to Slack
@@ -14,6 +14,7 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * See the console (coming soon)
 * Formatting (coming soon)
 * Send commands from Slack (coming soon)
+* Sponge (coming soon)
 
 ##Download
 [Stable builds](http://dev.bukkit.org/bukkit-plugins/slack/files/)
@@ -27,7 +28,7 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 4. Copy the webhook URL and set webhook: in the config.yml to that.
 5. Start the server.
 
-Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Probably works with any Bukkit API server.
+Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Definitely works with any Bukkit API server, probably.
 
 ##Commands
 **/slack** - The main slack command and command for all subcommands. Return help
