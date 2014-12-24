@@ -13,6 +13,7 @@ permissions:
         default: false
     slack.command:
         description: Allows you to send messages and reload Slack using /slack.
+        default: op
     slack.hide.login:
         description: Does not post to Slack when you login.
         default: false

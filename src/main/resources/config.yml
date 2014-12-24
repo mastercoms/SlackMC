@@ -2,6 +2,8 @@
 version: 1.5.0
 #The incoming webhook URL you got from Slack.
 webhook: https://hooks.slack.com/services/
+#The outgoing webhook token you got from Slack.
+token:
 #Show HTTP response codes in console
 debug: false
 #Send player commands to Slack

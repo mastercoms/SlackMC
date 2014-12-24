@@ -3,8 +3,6 @@ package org.circuitsoft.slack.bukkit;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -19,11 +17,13 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.circuitsoft.slack.api.BukkitPoster;
-import org.json.simple.JSONObject;
+import org.bukkit.scheduler.BukkitTask;
 
 public class SlackBukkit extends JavaPlugin implements Listener {
 
     private static String webhookUrl;
+    private BukkitTask getter;
+    private String token;
     private List<String> blacklist;
 
     @Override
@@ -32,10 +32,12 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         updateConfig(getDescription().getVersion());
         webhookUrl = getConfig().getString("webhook");
+        token = getConfig().getString("token");
         blacklist = getConfig().getStringList("blacklist");
         if (webhookUrl == null || webhookUrl.trim().isEmpty() || webhookUrl.equals("https://hooks.slack.com/services/")) {
             getLogger().severe("You have not set your webhook URL in the config!");
         }
+        getter = new SlackBukkitGetter(token, getServer()).runTaskAsynchronously(this);
     }
 
     @Override
@@ -115,7 +117,10 @@ public class SlackBukkit extends JavaPlugin implements Listener {
             if (sender.hasPermission("slack.command")) {
                 reloadConfig();
                 webhookUrl = getConfig().getString("webhook");
+                token = getConfig().getString("token");
                 blacklist = getConfig().getStringList("blacklist");
+                getter.cancel();
+                getter = new SlackBukkitGetter(token, getServer()).runTaskAsynchronously(this);
                 sender.sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
                 if (!(sender instanceof ConsoleCommandSender)) {
                     getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "Slack has been reloaded by " + sender.getName() + '.');
