@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 import org.bukkit.entity.Player;
 
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONObject;
 
 import static org.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
+import org.json.simple.JSONObject;
 
 /**
  * Posts a message to Slack when using Bukkit.
