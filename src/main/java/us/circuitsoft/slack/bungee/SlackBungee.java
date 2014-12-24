@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.logging.Level;
-
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.event.ServerConnectedEvent;
@@ -56,24 +55,24 @@ public class SlackBungee extends Plugin implements Listener {
     public void onChat(ChatEvent event) {
         ProxiedPlayer p = (ProxiedPlayer) event.getSender();
         if (event.isCommand()) {
-            if (!hasPermission(p, "slack.hide.command") && !isOnBlacklist(event.getMessage())) {
+            if (hasPermission(p, "slack.hide.command") && isOnBlacklist(event.getMessage())) {
                 send('"' + event.getMessage() + '"', p.getName() + " (" + p.getServer().getInfo().getName() + ")");
             }
-        } else if (!hasPermission(p, "slack.hide.chat")) {
+        } else if (hasPermission(p, "slack.hide.chat")) {
             send('"' + event.getMessage() + '"', p.getName() + " (" + p.getServer().getInfo().getName() + ")");
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(ServerConnectedEvent event) {
-        if (!hasPermission(event.getPlayer(), "slack.hide.login")) {
+        if (hasPermission(event.getPlayer(), "slack.hide.login")) {
             send("logged in", event.getPlayer().getName() + " (" + event.getServer().getInfo().getName() + ")");
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(ServerDisconnectEvent event) {
-        if (!hasPermission(event.getPlayer(), "slack.hide.logout")) {
+        if (hasPermission(event.getPlayer(), "slack.hide.logout")) {
             send("logged out", event.getPlayer().getName() + " (" + event.getTarget().getName() + ")");
         }
     }
@@ -88,9 +87,9 @@ public class SlackBungee extends Plugin implements Listener {
 
     private boolean isOnBlacklist(String name) {
         if (config.getBoolean("use-blacklist")) {
-            return blacklist.contains(name);
+            return !blacklist.contains(name);
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -125,9 +124,9 @@ public class SlackBungee extends Plugin implements Listener {
 
     private boolean hasPermission(ProxiedPlayer player, String permission) {
         if (config.getBoolean("use-perms")) {
-            return player.hasPermission(permission);
+            return !player.hasPermission(permission);
         } else {
-            return false;
+            return true;
         }
     }
 

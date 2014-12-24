@@ -1,7 +1,6 @@
 package us.circuitsoft.slack.bukkit;
 
 import java.util.List;
-
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -40,28 +39,28 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event) {
-        if (!hasPermission("slack.hide.chat", event.getPlayer())) {
+        if (hasPermission("slack.hide.chat", event.getPlayer())) {
             send('"' + event.getMessage() + '"', event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerJoinEvent event) {
-        if (!hasPermission("slack.hide.login", event.getPlayer())) {
+        if (hasPermission("slack.hide.login", event.getPlayer())) {
             send("logged in", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        if (!hasPermission("slack.hide.logout", event.getPlayer())) {
+        if (hasPermission("slack.hide.logout", event.getPlayer())) {
             send("logged out", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (!isOnBlacklist(event.getMessage()) && !hasPermission("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
+        if (isOnBlacklist(event.getMessage()) && hasPermission("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
             send(event.getMessage(), event.getPlayer().getName());
         }
     }
@@ -76,9 +75,9 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     private boolean isOnBlacklist(String name) {
         if (getConfig().getBoolean("use-blacklist")) {
-            return blacklist.contains(name);
+            return !blacklist.contains(name);
         } else {
-            return false;
+            return true;
         }
     }
 
@@ -91,9 +90,15 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     private boolean hasPermission(String permission, Player player) {
         if (getConfig().getBoolean("use-perms")) {
-            return player.hasPermission(permission);
+            return !player.hasPermission(permission);
         } else {
-            return false;
+            return true;
+        }
+    }
+
+    public void execute(String token, String command) {
+        if (token == null ? getConfig().getString("token") == null : token.equals(getConfig().getString("token"))) {
+            getServer().dispatchCommand(getServer().getConsoleSender(), command);
         }
     }
 
@@ -102,12 +107,12 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         if (!cmd.getName().equalsIgnoreCase("slack")) {
             return false;
         }
-        if (!sender.hasPermission("slack.reload") && sender.hasPermission("slack.send")) {
+        if (!sender.hasPermission("slack.command")) {
             sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
         } else if (args.length == 0) {
-            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack \n/slack reload - reload Slack's config");
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
         } else if (args[0].equalsIgnoreCase("reload")) {
-            if (sender.hasPermission("slack.reload")) {
+            if (sender.hasPermission("slack.command")) {
                 reloadConfig();
                 webhookUrl = getConfig().getString("webhook");
                 blacklist = getConfig().getStringList("blacklist");
@@ -119,7 +124,7 @@ public class SlackBukkit extends JavaPlugin implements Listener {
                 sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
             }
         } else if (args[0].equalsIgnoreCase("send")) {
-            if (sender.hasPermission("slack.send")) {
+            if (sender.hasPermission("slack.command")) {
                 if (args.length <= 3) {
                     sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message>");
                 } else if (args.length >= 4) {

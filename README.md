@@ -10,7 +10,7 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 * Blacklist players or commands from being sent to Slack
 * Use permissions to block messages to Slack
 * API to send custom messages
-* BungeeCord support (partial)
+* BungeeCord support
 * See the console (coming soon)
 * Formatting (coming soon)
 * Send commands from Slack (coming soon)
@@ -30,8 +30,13 @@ Spigot/CraftBukkit/Bukkit/BungeeCord plugin for [Slack](https://slack.com)
 Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Probably works with any Bukkit API server.
 
 ##Commands
-**/slack** - reloads the config or sends a message
-_permission: slack.reload or slack.send_
+**/slack** - The main slack command and command for all subcommands. Return help
+_permission: slack.command_
+
+###Subcommands
+**/slack send** - Sends a command to slack. Read the custom messages section for details.
+
+**/slack reload**- Reloads Slack's config. Does not reload the plugin.
 
 ##Configuration
 **version** - the plugin's current version. Do not touch this.
@@ -45,14 +50,8 @@ _permission: slack.reload or slack.send_
 **slack.hide.command** - _does not post commands you do to Slack._
 default: no one
 
-**slack.reload** - _allows you to reload the plugin's config using the command **/slack reload**_
+**slack.command** - _allows you to do **/slack** and all sub commands_
 default: op
-
-**slack.send** - _allows you to send a custom message using the command **/slack** as explained below_
-default: op
-
-**slack.hide.login** - /_does not post to Slack when you login._
-default: no one
 
 **slack.hide.logout** - _does not post to Slack when you login._
 default: no one
@@ -79,7 +78,7 @@ If you're using Bukkit,
 ```java
 new BukkitPoster(message, name, iconUrl).runTaskAsynchronously(this);
 ```
-where message is the message (!), name is the username, and iconUrl is the image URL. You can set iconUrl to null if name is a Minecraft player username, it will then use the pleayer's skin head.
+where message is the message (!), name is the username, and iconUrl is the image URL. You can set iconUrl to null if name is a Minecraft player username, it will then use the player's skin head.
 
 If you're using BungeeCord, schedule a new BungeePoster instance asnychronous. Same parameters as in the Bukkit version.
 

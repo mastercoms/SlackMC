@@ -1,7 +1,8 @@
 name: Slack
-version: 1.4.0
+version: 1.5.0
 description: Link your server to Slack!
 author: CircuitSoft
+authors: [Janmm14, LaxWasHere, it3d]
 website: https://circuitsoft.us
 
 main: us.circuitsoft.slack.bukkit.SlackBukkit
@@ -10,12 +11,8 @@ permissions:
     slack.hide.command:
         description: Does not post commands you do to Slack.
         default: false
-    slack.reload:
-        description: Allows you to reload the config with /slack reload.
-        default: false
-    slack.send:
-        description: Allows you to send a custom message to slack with /slack send.
-        default: false
+    slack.command:
+        description: Allows you to send messages and reload Slack using /slack.
     slack.hide.login:
         description: Does not post to Slack when you login.
         default: false
@@ -27,6 +24,6 @@ permissions:
         default: false
 commands:
     slack:
-        description: Slack command, for help type /slack
+        description: Help command for Slack.
         permission: slack.command
         usage: Do /slack for a list of Slack's commands.
