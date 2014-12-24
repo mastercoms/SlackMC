@@ -28,7 +28,17 @@ Spigot/CraftBukkit/Bukkit/BungeeCord/Glowstone plugin for [Slack](https://slack.
 4. Copy the webhook URL and set webhook: in the config.yml to that.
 5. Start the server.
 
+
 Verified compatible with CraftBukkit, Spigot, Spigot/CraftBukkit 1.8, and Glowstone. Definitely works with any Bukkit API server, probably.
+
+###Slack setup
+1. Log into your Slack account and go to https://my.slack.com/services/new/incoming-webhook
+2. Click on the Add New Integration link on the left-hand side.
+3. Scroll down and select Incoming Webhooks.
+4. Select a channel/direct message recipient and click the green Add Incoming WebHook button.
+5. A green "New Integration added!" confirmation message will appear. Scroll down the page and copy the URL under "Your Unique Webhook URL." It will look something like this: https://yourcompany.slack.com/services/hooks/incoming-webhook?token=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+6. Under the Integration Settings section, you have the option to label your integration, change the name of your Slack bot and its icon. By default, the bot name is incoming-webhook and the default icon is a Sprintly icon. These are optional settings.
+7. Scroll down to the bottom of the page and click the blue Save Integration button.
 
 ##Commands
 **/slack** - The main slack command and command for all subcommands. Return help
@@ -79,9 +89,13 @@ If you're using Bukkit,
 ```java
 new BukkitPoster(message, name, iconUrl).runTaskAsynchronously(this);
 ```
-where message is the message (!), name is the username, and iconUrl is the image URL. You can set iconUrl to null if name is a Minecraft player username, it will then use the player's skin head.
+where message is the message you want to send to Slack, name is the username, and iconUrl is the image URL. You can set iconUrl to null if name is a Minecraft player username, it will then use the player's skin head.
 
-If you're using BungeeCord, schedule a new BungeePoster instance asnychronous. Same parameters as in the Bukkit version.
+If you're using BungeeCord, 
+```java
+getProxy().getScheduler().runAsync(this, new BungeePoster(essage, name, iconUrl));
+```
+Same parameters as in the Bukkit version.
 
 ##Support
 For support questions on how to use the plugin and troubleshooting, post a comment so if I am not available, other people can help you. Explain your problem and use the latest version before asking for help.
