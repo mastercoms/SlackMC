@@ -2,8 +2,8 @@
 version: 1.5.0
 #The incoming webhook URL you got from Slack.
 webhook: https://hooks.slack.com/services/
-#Show HTTP response codes in console
-debug: false
+#The outgoing webhook token you got from Slack.
+token: 
 #Send player commands to Slack
 send-commands: true
 #Causes a bit of lag but you can have certain players not post to Slack
