@@ -1,4 +1,4 @@
 name: Slack
 main: us.circuitsoft.slack.bungee.SlackBungee
-version: 1.4.1
+version: 1.4.2
 author: CircuitSoft

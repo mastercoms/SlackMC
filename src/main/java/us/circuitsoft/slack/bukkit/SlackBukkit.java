@@ -39,28 +39,28 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event) {
-        if (hasPermission("slack.hide.chat", event.getPlayer())) {
+        if (isVisible("slack.hide.chat", event.getPlayer())) {
             send('"' + event.getMessage() + '"', event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerJoinEvent event) {
-        if (hasPermission("slack.hide.login", event.getPlayer())) {
+        if (isVisible("slack.hide.login", event.getPlayer())) {
             send("logged in", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        if (hasPermission("slack.hide.logout", event.getPlayer())) {
+        if (isVisible("slack.hide.logout", event.getPlayer())) {
             send("logged out", event.getPlayer().getName());
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (isOnBlacklist(event.getMessage()) && hasPermission("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
+        if (isAllowed(event.getMessage()) && isVisible("slack.hide.command", event.getPlayer())) {
             send(event.getMessage(), event.getPlayer().getName());
         }
     }
@@ -73,9 +73,9 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         new SlackBukkitPoster(this, message, name, iconUrl).runTaskAsynchronously(this);
     }
 
-    private boolean isOnBlacklist(String name) {
+    private boolean isAllowed(String command) {
         if (getConfig().getBoolean("use-blacklist")) {
-            return !blacklist.contains(name);
+            return !blacklist.contains(command);
         } else {
             return true;
         }
@@ -88,17 +88,11 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         saveConfig();
     }
 
-    private boolean hasPermission(String permission, Player player) {
+    private boolean isVisible(String permission, Player player) {
         if (getConfig().getBoolean("use-perms")) {
             return !player.hasPermission(permission);
         } else {
             return true;
-        }
-    }
-
-    public void execute(String token, String command) {
-        if (token == null ? getConfig().getString("token") == null : token.equals(getConfig().getString("token"))) {
-            getServer().dispatchCommand(getServer().getConsoleSender(), command);
         }
     }
 

@@ -6,11 +6,9 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.logging.Level;
-
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
-
 import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
@@ -53,8 +51,8 @@ public class SlackBukkitPoster extends BukkitRunnable {
             webhookConnection.disconnect();
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{
-                        webhookConnection.getResponseCode(),
-                        webhookConnection.getResponseMessage()
+                    webhookConnection.getResponseCode(),
+                    webhookConnection.getResponseMessage()
                 });
             }
         } catch (MalformedURLException e) {
