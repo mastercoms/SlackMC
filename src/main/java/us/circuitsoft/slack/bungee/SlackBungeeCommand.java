@@ -48,8 +48,9 @@ public class SlackBungeeCommand extends Command {
                     boolean first = true;
                     for (int i = 3; i < args.length; i++) {
                         if (first) {
-                            sb.append(" ");
                             first = false;
+                        } else {
+                            sb.append(" ");
                         }
                         sb.append(args[i]);
                     }

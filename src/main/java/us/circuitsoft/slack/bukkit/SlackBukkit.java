@@ -1,5 +1,6 @@
 package us.circuitsoft.slack.bukkit;
 
+import java.text.MessageFormat;
 import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -60,7 +61,7 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (isAllowed(event.getMessage()) && isVisible("slack.hide.command", event.getPlayer())) {
+        if (isAllowed(event.getMessage()) && isVisible("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
             send(event.getMessage(), event.getPlayer().getName());
         }
     }
@@ -126,11 +127,19 @@ public class SlackBukkit extends JavaPlugin implements Listener {
                     boolean first = true;
                     for (int i = 3; i < args.length; i++) {
                         if (first) {
-                            sb.append(" ");
                             first = false;
+                        } else {
+                            sb.append(" ");
                         }
                         sb.append(args[i]);
                     }
+                    String senderName;
+                    if (sender instanceof ConsoleCommandSender) {
+                        senderName = "Console";
+                    } else {
+                        senderName = sender.getName();
+                    }
+                    sb.append(MessageFormat.format(" (sent by {0})", senderName));
                     send(sb.toString(), args[1], args[2].equalsIgnoreCase("null") ? null : args[2]);
                 }
             } else {
