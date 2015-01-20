@@ -19,6 +19,22 @@ public class BukkitPoster extends BukkitRunnable {
     private final String message;
     private final String webhookUrl = getWebhookUrl();
     private final String iconUrl;
+    private final Boolean isAction;
+
+    /**
+     * Prepares the message to send to Slack.
+     *
+     * @param message The message to send to Slack.
+     * @param name    The username of the message to send to Slack.
+     * @param iconUrl The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
+     * @param isAction  The message is an action or not.
+     */
+    public BukkitPoster(String message, String name, String iconUrl, Boolean isAction) {
+        this.name = name;
+        this.message = message;
+        this.iconUrl = iconUrl;
+        this.isAction = isAction;
+    }
 
     /**
      * Prepares the message to send to Slack.
@@ -28,15 +44,20 @@ public class BukkitPoster extends BukkitRunnable {
      * @param iconUrl The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
      */
     public BukkitPoster(String message, String name, String iconUrl) {
-        this.name = name;
-        this.message = message;
-        this.iconUrl = iconUrl;
+         this(message, name, iconUrl, false);
     }
 
     @Override
     public void run() {
         JSONObject json = new JSONObject();
-        json.put("text", name + ": " + message);
+        if (isAction) {
+          json.put("text", "_" + message + "_");
+        } else if (message.startsWith("/")) {
+        	json.put("text", "```" + message + "```");
+        } else {
+        	json.put("text", message);
+        	json.put("mrkdwn", false);
+        }
         json.put("username", name);
         if (iconUrl == null) {
             json.put("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");

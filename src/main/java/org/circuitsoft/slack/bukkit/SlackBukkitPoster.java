@@ -21,18 +21,31 @@ public class SlackBukkitPoster extends BukkitRunnable {
     private final String message;
     private final String webhookUrl = getWebhookUrl();
     private final String iconUrl;
+    private final Boolean isAction;
 
     public SlackBukkitPoster(JavaPlugin plugin, String message, String name, String iconUrl) {
+        this(plugin, message, name, iconUrl, false);
+    }
+
+    public SlackBukkitPoster(JavaPlugin plugin, String message, String name, String iconUrl, Boolean isAction) {
         this.plugin = plugin;
         this.name = name;
         this.message = message;
         this.iconUrl = iconUrl;
+        this.isAction = isAction;
     }
 
     @Override
     public void run() {
         JSONObject json = new JSONObject();
-        json.put("text", name + ": " + message);
+        if (isAction) {
+          json.put("text", "_" + message + "_");
+        } else if (message.startsWith("/")) {
+        	json.put("text", "```" + message + "```");
+        } else {
+        	json.put("text", message);
+        	json.put("mrkdwn", false);
+        }
         json.put("username", name);
         if (iconUrl == null) {
             json.put("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
