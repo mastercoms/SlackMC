@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.bukkit;
+package org.circuitsoft.slack.bukkit;
 
 import org.bukkit.Server;
 import org.bukkit.scheduler.BukkitRunnable;

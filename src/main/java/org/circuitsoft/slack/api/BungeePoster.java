@@ -1,55 +1,53 @@
-package us.circuitsoft.slack.api;
+package org.circuitsoft.slack.api;
 
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 
-import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
-import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
+import static org.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
 
 /**
- * Posts a message to Slack when using Bukkit.
+ * Posts a message to Slack when using Bungee.
  */
-public class BukkitPoster extends BukkitRunnable {
+public class BungeePoster implements Runnable {
 
     private final String name;
     private final String message;
     private final String webhookUrl = getWebhookUrl();
-    private final String iconUrl;
+    private final String icon;
 
     /**
      * Prepares the message to send to Slack.
      *
      * @param message The message to send to Slack.
      * @param name    The username of the message to send to Slack.
-     * @param iconUrl The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
+     * @param icon    The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
      */
-    public BukkitPoster(String message, String name, String iconUrl) {
+    public BungeePoster(String message, String name, String icon) {
         this.name = name;
         this.message = message;
-        this.iconUrl = iconUrl;
+        this.icon = icon;
     }
 
     @Override
     public void run() {
-        JSONObject json = new JSONObject();
-        json.put("text", name + ": " + message);
-        json.put("username", name);
-        if (iconUrl == null) {
-            json.put("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
+        JsonObject json = new JsonObject();
+        json.addProperty("text", name + ": " + message);
+        json.addProperty("username", name);
+        if (icon == null) {
+            json.addProperty("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
         } else {
-            json.put("icon_url", iconUrl);
+            json.addProperty("icon_url", icon);
         }
-        String jsonStr = "payload=" + json.toJSONString();
         try {
             HttpURLConnection webhookConnection = (HttpURLConnection) new URL(webhookUrl).openConnection();
             webhookConnection.setRequestMethod("POST");
             webhookConnection.setDoOutput(true);
             try (BufferedOutputStream bufOut = new BufferedOutputStream(webhookConnection.getOutputStream())) {
-                bufOut.write(jsonStr.getBytes(StandardCharsets.UTF_8));
+                String jsonStr = "payload=" + json.toString();
+                bufOut.write(jsonStr.getBytes("utf8"));
                 bufOut.flush();
             }
             webhookConnection.disconnect();
