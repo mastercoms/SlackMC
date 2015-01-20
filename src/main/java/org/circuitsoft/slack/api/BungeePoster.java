@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.api;
+package org.circuitsoft.slack.api;
 
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
@@ -6,7 +6,7 @@ import java.net.URL;
 
 import com.google.gson.JsonObject;
 
-import static us.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
+import static org.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
 
 /**
  * Posts a message to Slack when using Bungee.

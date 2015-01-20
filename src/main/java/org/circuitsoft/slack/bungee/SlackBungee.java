@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.bungee;
+package org.circuitsoft.slack.bungee;
 
 import java.io.File;
 import java.io.IOException;

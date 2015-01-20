@@ -1,7 +1,9 @@
-package us.circuitsoft.slack.bukkit;
+package org.circuitsoft.slack.bukkit;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.UUID;
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -47,7 +49,7 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerJoinEvent event) {
-        if (isVisible("slack.hide.login", event.getPlayer())) {
+        if (isVisible("slack.hide.login", event.getPlayer().getUniqueId())) {
             send("logged in", event.getPlayer().getName());
         }
     }
@@ -92,6 +94,14 @@ public class SlackBukkit extends JavaPlugin implements Listener {
     private boolean isVisible(String permission, Player player) {
         if (getConfig().getBoolean("use-perms")) {
             return !player.hasPermission(permission);
+        } else {
+            return true;
+        }
+    }
+    
+    private boolean isVisible(String permission, UUID uuid) {
+        if (getConfig().getBoolean("use-perms")) {
+            return !Bukkit.getServer().getPlayer(uuid).hasPermission(permission);
         } else {
             return true;
         }

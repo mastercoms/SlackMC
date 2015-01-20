@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.api;
+package org.circuitsoft.slack.api;
 
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
@@ -8,7 +8,7 @@ import java.nio.charset.StandardCharsets;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
 
-import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
+import static org.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
  * Posts a message to Slack when using Bukkit.

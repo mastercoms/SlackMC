@@ -1,11 +1,11 @@
 name: Slack
-version: 1.4.3
+version: 1.4.4
 description: Link your server to Slack!
 author: CircuitSoft
 authors: [Janmm14, LaxWasHere, it3d]
 website: https://circuitsoft.us
 
-main: us.circuitsoft.slack.bukkit.SlackBukkit
+main: org.circuitsoft.slack.bukkit.SlackBukkit
 
 permissions:
     slack.hide.command:

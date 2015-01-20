@@ -1,5 +1,5 @@
 #The version. Do not touch this.
-version: 1.4.3
+version: 1.4.4
 #The incoming webhook URL you got from Slack.
 webhook: https://hooks.slack.com/services/
 #Show HTTP response codes in console

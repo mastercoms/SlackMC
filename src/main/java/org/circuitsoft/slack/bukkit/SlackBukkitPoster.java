@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.bukkit;
+package org.circuitsoft.slack.bukkit;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.json.simple.JSONObject;
-import static us.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
+import static org.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
  * Poster for Slack plugin's internal use. Do not use this.
@@ -49,10 +49,12 @@ public class SlackBukkitPoster extends BukkitRunnable {
                 bufOut.flush();
             }
             webhookConnection.disconnect();
+            int responseCode = webhookConnection.getResponseCode();
+            String responseMessage = webhookConnection.getResponseMessage();
             if (plugin.getConfig().getBoolean("debug")) {
                 plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{
-                    webhookConnection.getResponseCode(),
-                    webhookConnection.getResponseMessage()
+                    responseCode,
+                    responseMessage
                 });
             }
         } catch (MalformedURLException e) {
