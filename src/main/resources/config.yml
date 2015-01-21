@@ -6,7 +6,9 @@ webhook: https://hooks.slack.com/services/
 token:
 #Show HTTP response codes in console
 debug: false
-#Causes a bit of lag but you can hvae certain players not post to Slack
+#Send player commands to Slack
+send-commands: false
+#Causes a bit of lag but you can have certain players not post to Slack
 use-perms: false
 #Causes lag but you can block commands from being shown to Slack
 use-blacklist: false
@@ -14,3 +16,13 @@ use-blacklist: false
 blacklist:
     - /login
     - /register
+#incoming-webhook
+incoming-webhook:
+  enable: false
+  bindaddress: 0.0.0.0
+  port: 25560
+  max-connections: 30
+  token: ""
+  msgformat: "&color;f<&color;5(Slack) &color;f%username%> %message%"
+  # msgprefix: "&color;5[Slack]"
+  # msgsuffix: "&color;f"

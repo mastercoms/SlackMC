@@ -1,4 +1,4 @@
-package us.circuitsoft.slack.bungee;
+package org.circuitsoft.slack.bungee;
 
 import java.io.BufferedOutputStream;
 import java.io.IOException;
@@ -12,7 +12,7 @@ import com.google.gson.JsonObject;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.config.Configuration;
 
-import static us.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
+import static org.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
 
 /**
  * Poster for Slack plugin's internal use. Do not use this.
@@ -54,10 +54,12 @@ public class SlackBungeePoster implements Runnable {
                 bufOut.flush();
             }
             webhookConnection.disconnect();
+            int responseCode = webhookConnection.getResponseCode();
+            String responseMessage = webhookConnection.getResponseMessage();
             if (config.getBoolean("debug")) {
                 plugin.getLogger().log(Level.INFO, "{0} {1}", new Object[]{
-                        webhookConnection.getResponseCode(),
-                        webhookConnection.getResponseMessage()
+                        responseCode,
+                        responseMessage
                 });
             }
         } catch (MalformedURLException e) {
