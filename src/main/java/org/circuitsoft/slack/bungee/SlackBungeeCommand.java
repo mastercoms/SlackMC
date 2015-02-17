@@ -12,7 +12,6 @@ public class SlackBungeeCommand extends Command {
 
     public static final BaseComponent[] helpMsg = new ComponentBuilder("/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack\n/slack reload - reload Slack's config").color(ChatColor.GOLD).create();
     private static final BaseComponent[] sendHelpMsg = new ComponentBuilder("/slack send <username> <image URL or null for username's skin> <message>").color(ChatColor.GOLD).create();
-    private static final BaseComponent[] reloadHelpMsg = new ComponentBuilder("/slack reload - reload Slack's config").color(ChatColor.GOLD).create();
     private static final BaseComponent[] reloadMsg = new ComponentBuilder("Slack has been reloaded.").color(ChatColor.GREEN).create();
     private static final BaseComponent[] noPermMsg = new ComponentBuilder("You are not allowed to execute this command!").color(ChatColor.DARK_RED).create();
 
@@ -54,7 +53,11 @@ public class SlackBungeeCommand extends Command {
                         }
                         sb.append(args[i]);
                     }
-                    plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(sb.toString(), args[1], args[2].equalsIgnoreCase("null") ? null : args[2]));
+                    if (args[2].equalsIgnoreCase("null")) {
+                        plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(sb.toString(), args[1], "https://cravatar.eu/helmhead/" + plugin.getProxy().getPlayer(args[1]).getUniqueId() + "/128.png", false));
+                    } else {
+                        plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(sb.toString(), args[1], args[2], false));
+                    }
                 }
             } else {
                 sender.sendMessage(noPermMsg);

@@ -3,6 +3,7 @@ package org.circuitsoft.slack.bukkit;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -17,6 +18,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.circuitsoft.slack.api.BukkitPoster;
+import org.json.simple.JSONObject;
 
 public class SlackBukkit extends JavaPlugin implements Listener {
 
@@ -42,38 +45,38 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onChat(AsyncPlayerChatEvent event) {
-        if (isVisible("slack.hide.chat", event.getPlayer())) {
-            send('"' + event.getMessage() + '"', event.getPlayer().getName());
+        if (isVisible("slack.hide.chat", event.getPlayer().getUniqueId())) {
+            send(event.getMessage(), event.getPlayer(), false);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onLogin(PlayerJoinEvent event) {
         if (isVisible("slack.hide.login", event.getPlayer().getUniqueId())) {
-            send("logged in", event.getPlayer().getName());
+            send("_joined_", event.getPlayer(), true);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onQuit(PlayerQuitEvent event) {
-        if (isVisible("slack.hide.logout", event.getPlayer())) {
-            send("logged out", event.getPlayer().getName());
+        if (isVisible("slack.hide.logout", event.getPlayer().getUniqueId())) {
+            send("_quit_", event.getPlayer(), true);
         }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
     public void onCommand(PlayerCommandPreprocessEvent event) {
-        if (isAllowed(event.getMessage()) && isVisible("slack.hide.command", event.getPlayer()) && !event.getMessage().contains("/slack send")) {
-            send(event.getMessage(), event.getPlayer().getName());
+        if (!getConfig().getBoolean("send-commands")) {
+            return;
+        }
+        String command = event.getMessage().split(" ")[0];
+        if (isAllowed(command) && isVisible("slack.hide.command", event.getPlayer().getUniqueId()) && !event.getMessage().contains("/slack send")) {
+            send(event.getMessage(), event.getPlayer(), false);
         }
     }
-
-    public void send(String message, String name) {
-        new SlackBukkitPoster(this, message, name, null).runTaskAsynchronously(this);
-    }
-
-    public void send(String message, String name, String iconUrl) {
-        new SlackBukkitPoster(this, message, name, iconUrl).runTaskAsynchronously(this);
+    
+    private void send(String message, Player player, boolean useMarkdown) {
+        new BukkitPoster(message, player, useMarkdown).runTaskAsynchronously(this);
     }
 
     private boolean isAllowed(String command) {
@@ -90,18 +93,10 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         getConfig().set("version", version);
         saveConfig();
     }
-
-    private boolean isVisible(String permission, Player player) {
-        if (getConfig().getBoolean("use-perms")) {
-            return !player.hasPermission(permission);
-        } else {
-            return true;
-        }
-    }
     
     private boolean isVisible(String permission, UUID uuid) {
         if (getConfig().getBoolean("use-perms")) {
-            return !Bukkit.getServer().getPlayer(uuid).hasPermission(permission);
+            return !getServer().getPlayer(uuid).hasPermission(permission);
         } else {
             return true;
         }
@@ -150,13 +145,17 @@ public class SlackBukkit extends JavaPlugin implements Listener {
                         senderName = sender.getName();
                     }
                     sb.append(MessageFormat.format(" (sent by {0})", senderName));
-                    send(sb.toString(), args[1], args[2].equalsIgnoreCase("null") ? null : args[2]);
+                    if (args[2].equalsIgnoreCase("null")) {
+                        new BukkitPoster(sb.toString(), args[1], "https://cravatar.eu/helmhead/" + getServer().getPlayer(args[1]).getUniqueId() + "/128.png", false).runTaskAsynchronously(this);
+                    } else {
+                        new BukkitPoster(sb.toString(), args[1], args[2], false).runTaskAsynchronously(this);
+                    } 
                 }
             } else {
                 sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
             }
         } else {
-            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack \n/slack reload - reload Slack's config");
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
         }
         return true;
     }
