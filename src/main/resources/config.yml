@@ -5,7 +5,7 @@ webhook: https://hooks.slack.com/services/
 #Show HTTP response codes in console
 debug: false
 #Send player commands to Slack
-send-commands: false
+send-commands: true
 #Causes a bit of lag but you can have certain players not post to Slack
 use-perms: false
 #Causes lag but you can block commands from being shown to Slack

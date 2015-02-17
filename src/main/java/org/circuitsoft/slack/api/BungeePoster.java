@@ -5,6 +5,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import com.google.gson.JsonObject;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import static org.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
 
@@ -12,35 +13,67 @@ import static org.circuitsoft.slack.bungee.SlackBungee.getWebhookUrl;
  * Posts a message to Slack when using Bungee.
  */
 public class BungeePoster implements Runnable {
-
-    private final String name;
+    
     private final String message;
+    private final String name;
+    private final String iconUrl;
+    private final boolean useMarkdown;
     private final String webhookUrl = getWebhookUrl();
-    private final String icon;
 
     /**
-     * Prepares the message to send to Slack.
+     * Posts a message to Slack involving the proxy or network.
      *
-     * @param message The message to send to Slack.
-     * @param name    The username of the message to send to Slack.
-     * @param icon    The image URL of the user that sends the message to Slack. Make this null if the username is a Minecraft player name.
+     * @param message The message sent to Slack.
+     * @param name The name attributed to the message sent to Slack.
+     * @param iconUrl The image URL of the user that sends the message to Slack.
+     * @param useMarkdown Use markdown formatting in the message.
      */
-    public BungeePoster(String message, String name, String icon) {
-        this.name = name;
+    public BungeePoster(String message, String name, String iconUrl, boolean useMarkdown) {
         this.message = message;
-        this.icon = icon;
+        this.name = name;
+        this.useMarkdown = useMarkdown;
+        this.iconUrl = iconUrl;
+    }
+    
+    /**
+     * Posts a message to Slack involving a server on the proxy.
+     *
+     * @param message The message sent to Slack.
+     * @param name The name attributed to the message sent to Slack.
+     * @param iconUrl The image URL of the user that sends the message to Slack.
+     * @param serverName The server the event took place on.
+     * @param useMarkdown Use markdown formatting in the message.
+     */
+    public BungeePoster(String message, String name, String iconUrl, String serverName, boolean useMarkdown) {
+        this.message = message;
+        this.name = name + " (" + serverName + ")";
+        this.useMarkdown = useMarkdown;
+        this.iconUrl = iconUrl;
+    }
+    
+     /**
+     * Posts a player sent message to Slack.
+     *
+     * @param message The message sent to Slack.
+     * @param player The player that sent the message.
+     * @param serverName The server the player is on.
+     * @param useMarkdown Use markdown formatting in the message.
+     */
+    public BungeePoster(String message, ProxiedPlayer player, String serverName, boolean useMarkdown) {
+        this.message = message;
+        
+        name = player.getName() + " (" + serverName + ")";
+        iconUrl = "https://cravatar.eu/helmhead/" + player.getUniqueId().toString() + "/128.png";
+        this.useMarkdown = useMarkdown;
     }
 
     @Override
     public void run() {
         JsonObject json = new JsonObject();
-        json.addProperty("text", name + ": " + message);
+        json.addProperty("text", message);
         json.addProperty("username", name);
-        if (icon == null) {
-            json.addProperty("icon_url", "https://cravatar.eu/helmhead/" + name + "/100.png");
-        } else {
-            json.addProperty("icon_url", icon);
-        }
+        json.addProperty("icon_url", iconUrl);;
+        json.addProperty("mrkdwn", useMarkdown);
         try {
             HttpURLConnection webhookConnection = (HttpURLConnection) new URL(webhookUrl).openConnection();
             webhookConnection.setRequestMethod("POST");
@@ -49,8 +82,11 @@ public class BungeePoster implements Runnable {
                 String jsonStr = "payload=" + json.toString();
                 bufOut.write(jsonStr.getBytes("utf8"));
                 bufOut.flush();
+                bufOut.close();
             }
+            int serverResponseCode = webhookConnection.getResponseCode();
             webhookConnection.disconnect();
+            webhookConnection = null;
         } catch (Exception ignored) {
         }
     }

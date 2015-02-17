@@ -16,6 +16,7 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
+import org.circuitsoft.slack.api.BungeePoster;
 
 public class SlackBungee extends Plugin implements Listener {
 
@@ -55,39 +56,38 @@ public class SlackBungee extends Plugin implements Listener {
     public void onChat(ChatEvent event) {
         ProxiedPlayer p = (ProxiedPlayer) event.getSender();
         if (event.isCommand()) {
-            if (hasPermission(p, "slack.hide.command") && isOnBlacklist(event.getMessage())) {
-                send('"' + event.getMessage() + '"', p.getName() + " (" + p.getServer().getInfo().getName() + ")");
+            if (!config.getBoolean("send-commands")) {
+                return;
+            }
+            if (hasPermission(p, "slack.hide.command") && isAllowed(event.getMessage())) {
+                send(event.getMessage(), p, p.getServer().getInfo().getName(), false);
             }
         } else if (hasPermission(p, "slack.hide.chat")) {
-            send('"' + event.getMessage() + '"', p.getName() + " (" + p.getServer().getInfo().getName() + ")");
+            send(event.getMessage(), p, p.getServer().getInfo().getName(), false);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onJoin(ServerConnectedEvent event) {
         if (hasPermission(event.getPlayer(), "slack.hide.login")) {
-            send("logged in", event.getPlayer().getName() + " (" + event.getServer().getInfo().getName() + ")");
+            send("_joined_", event.getPlayer(), event.getServer().getInfo().getName(), true);
         }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onQuit(ServerDisconnectEvent event) {
         if (hasPermission(event.getPlayer(), "slack.hide.logout")) {
-            send("logged out", event.getPlayer().getName() + " (" + event.getTarget().getName() + ")");
+            send("_quit_", event.getPlayer(), event.getTarget().getName(), true);
         }
     }
 
-    public void send(String message, String name) {
-        send(message, name, null);
+    private void send(String message, ProxiedPlayer player, String serverName, boolean useMarkdown) {
+        getProxy().getScheduler().runAsync(this, new BungeePoster(message, player, serverName, useMarkdown));
     }
 
-    public void send(String message, String name, String iconUrl) {
-        getProxy().getScheduler().runAsync(this, new SlackBungeePoster(this, config, message, name, iconUrl));
-    }
-
-    private boolean isOnBlacklist(String name) {
+    private boolean isAllowed(String command) {
         if (config.getBoolean("use-blacklist")) {
-            return !blacklist.contains(name);
+            return !blacklist.contains(command);
         } else {
             return true;
         }
