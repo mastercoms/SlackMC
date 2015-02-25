@@ -14,3 +14,13 @@ use-blacklist: false
 blacklist:
     - /login
     - /register
+#incoming-webhook
+incoming-webhook:
+  enable: false
+  bindaddress: 0.0.0.0
+  port: 25560
+  max-connections: 30
+  token: ""
+  msgformat: "&color;f<&color;5(Slack) &color;f%username%> %message%"
+  # msgprefix: "&color;5[Slack]"
+  # msgsuffix: "&color;f"

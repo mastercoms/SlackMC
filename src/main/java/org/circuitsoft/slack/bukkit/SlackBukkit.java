@@ -21,9 +21,9 @@ import org.bukkit.scheduler.BukkitTask;
 
 public class SlackBukkit extends JavaPlugin implements Listener {
 
+<<<<<<< HEAD
     private static String webhookUrl;
     private BukkitTask getter;
-    private String token;
     private List<String> blacklist;
 
     @Override
@@ -32,16 +32,21 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(this, this);
         updateConfig(getDescription().getVersion());
         webhookUrl = getConfig().getString("webhook");
-        token = getConfig().getString("token");
         blacklist = getConfig().getStringList("blacklist");
         if (webhookUrl == null || webhookUrl.trim().isEmpty() || webhookUrl.equals("https://hooks.slack.com/services/")) {
             getLogger().severe("You have not set your webhook URL in the config!");
         }
-        getter = new SlackBukkitGetter(token, getServer()).runTaskAsynchronously(this);
+        if (getConfig().getConfigurationSection("incoming-webhook").getBoolean("enable")) {
+            getter = new SlackBukkitGetter(this);
+            getter.run();
+	}
     }
 
     @Override
     public void onDisable() {
+        if (getter != null) {
+            getter.stop();
+	}
         getLogger().info("Slack has been disabled!");
     }
 
@@ -117,10 +122,14 @@ public class SlackBukkit extends JavaPlugin implements Listener {
             if (sender.hasPermission("slack.command")) {
                 reloadConfig();
                 webhookUrl = getConfig().getString("webhook");
-                token = getConfig().getString("token");
                 blacklist = getConfig().getStringList("blacklist");
-                getter.cancel();
-                getter = new SlackBukkitGetter(token, getServer()).runTaskAsynchronously(this);
+                if (getter != null) {
+                    getter.stop();
+		}
+                if (getConfig().getConfigurationSection("incoming-webhook").getBoolean("enable")) {
+                    getter = new SlackBukkitGetter(this);
+                    getter.run();
+		}
                 sender.sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
                 if (!(sender instanceof ConsoleCommandSender)) {
                     getServer().getConsoleSender().sendMessage(ChatColor.GREEN + "Slack has been reloaded by " + sender.getName() + '.');
