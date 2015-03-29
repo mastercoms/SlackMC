@@ -1,5 +1,6 @@
 package org.circuitsoft.slack.api;
 
+import com.google.gson.JsonObject;
 import java.io.BufferedOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -7,14 +8,13 @@ import java.nio.charset.StandardCharsets;
 import org.bukkit.entity.Player;
 
 import org.bukkit.scheduler.BukkitRunnable;
-import org.json.simple.JSONObject;
 
 import static org.circuitsoft.slack.bukkit.SlackBukkit.getWebhookUrl;
 
 /**
- * Posts a message to Slack when using Bukkit.
+ * Posts a message to Slack immediately.
  */
-public class BukkitPoster extends BukkitRunnable {
+public class SlackSender extends BukkitRunnable {
 
     private final String message;
     private final String name;
@@ -23,14 +23,14 @@ public class BukkitPoster extends BukkitRunnable {
     private final String webhookUrl = getWebhookUrl();
 
     /**
-     * Posts a message to Slack.
+     * Posts a message to Slack immediately to the default channel.
      *
      * @param message The message sent to Slack.
      * @param name The name attributed to the message sent to Slack.
      * @param iconUrl The image URL of the user that sends the message to Slack.
      * @param useMarkdown Use markdown formatting in the message.
      */
-    public BukkitPoster(String message, String name, String iconUrl, boolean useMarkdown) {
+    public SlackSender(String message, String name, String iconUrl, boolean useMarkdown) {
         this.message = message;
         this.name = name;
         this.useMarkdown = useMarkdown;
@@ -38,28 +38,27 @@ public class BukkitPoster extends BukkitRunnable {
     }
     
      /**
-     * Posts a player sent message to Slack.
+     * Posts a player sent message to Slack immediately to the default channel.
      *
      * @param message The message sent to Slack.
      * @param player The player that sent the message.
      * @param useMarkdown Use markdown formatting in the message.
      */
-    public BukkitPoster(String message, Player player, boolean useMarkdown) {
+    public SlackSender(String message, Player player, boolean useMarkdown) {
         this.message = message;
         name = player.getName();
-        iconUrl = "https://cravatar.eu/helmhead/" + player.getUniqueId().toString() + "/128.png";
+        iconUrl = "https://crafatar.com/renders/head/" + player.getUniqueId().toString() + "/128.png";
         this.useMarkdown = useMarkdown;
     }
 
-
     @Override
     public void run() {
-        JSONObject json = new JSONObject();
-        json.put("text", message);
-        json.put("username", name);
-        json.put("icon_url", iconUrl);
-        json.put("mrkdwn", useMarkdown);
-        String jsonStr = "payload=" + json.toJSONString();
+        JsonObject json = new JsonObject();
+        json.addProperty("text", message);
+        json.addProperty("username", name);
+        json.addProperty("icon_url", iconUrl);
+        json.addProperty("mrkdwn", useMarkdown);
+        String jsonStr = "payload=" + json.toString();
         try {
             HttpURLConnection webhookConnection = (HttpURLConnection) new URL(webhookUrl).openConnection();
             webhookConnection.setRequestMethod("POST");

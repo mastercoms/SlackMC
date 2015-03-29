@@ -61,7 +61,6 @@ public class BungeePoster implements Runnable {
      */
     public BungeePoster(String message, ProxiedPlayer player, String serverName, boolean useMarkdown) {
         this.message = message;
-        
         name = player.getName() + " (" + serverName + ")";
         iconUrl = "https://cravatar.eu/helmhead/" + player.getUniqueId().toString() + "/128.png";
         this.useMarkdown = useMarkdown;
