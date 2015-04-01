@@ -1,5 +1,5 @@
 #SlackMC
-Link [Slack](https://slack.com] to Minecraft!  
+Link [Slack](https://slack.com) to Minecraft!  
 
 ##Features
 * Exchange messages between Minecraft and Slack
