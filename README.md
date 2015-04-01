@@ -28,4 +28,12 @@ Latest download
 10. Setup the config and channel options as you like, you can refer to the configuration guide if you need more guidance about this.
 11. If you modified the config while the server was on, do /slack reload. If the server was off, you can start it and your new config will take effect. It does not matter either way.
 
+##Compatibility
+SlackMC will work on any BungeeCord, Bukkit, Sponge, or Forge based system.  
+It has been verified to work with Spigot, PaperSpigot, CraftBukkit, BungeeCord, Glowstone, Sponge, Granite, Forge, and Cauldron.
+
+##Notes
+SlackMC is not created by, affiliated with, or supported by Slack Technologies, Inc.  
+The use of the name Slack within the product name SlackMC and the use of Slack branding only signifies integration with Slack, as SlackMC's only purpose is to provide a Slack wrapper for Minecraft.
+
 _developing..._
