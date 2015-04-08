@@ -24,7 +24,7 @@ global:
 channels:
     # The name of the channel
     default:
-        # The incoming webhook (required)
+        # The incoming webhook (required for default)
         incoming-webhook: 
         # The outgoing webhook (required when receiving Slack messages)
         outgoing-webhook: 
