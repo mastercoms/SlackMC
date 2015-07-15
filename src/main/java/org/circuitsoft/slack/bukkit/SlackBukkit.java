@@ -18,12 +18,12 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.circuitsoft.slack.api.BukkitPoster;
-import org.json.simple.JSONObject;
+import org.circuitsoft.slack.api.SlackMessage;
+import org.circuitsoft.slack.api.SlackPoster;
 
 public class SlackBukkit extends JavaPlugin implements Listener {
 
-    private static String webhookUrl;
+    private SlackPoster slackPoster;
     private List<String> blacklist;
 
     @Override
@@ -31,11 +31,16 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         getLogger().info("Slack has been enabled.");
         getServer().getPluginManager().registerEvents(this, this);
         updateConfig(getDescription().getVersion());
-        webhookUrl = getConfig().getString("webhook");
+        //todo: add more webhooks to SlackPoster
+        String webhookUrl = getConfig().getString("channels.default.incoming-webhook");
         blacklist = getConfig().getStringList("blacklist");
         if (webhookUrl == null || webhookUrl.trim().isEmpty() || webhookUrl.equals("https://hooks.slack.com/services/")) {
             getLogger().severe("You have not set your webhook URL in the config!");
+            setEnabled(false);
+            return;
         }
+        slackPoster = new SlackPoster(webhookUrl);
+        getServer().getScheduler().runTaskAsynchronously(this, slackPoster);
     }
 
     @Override
@@ -76,7 +81,7 @@ public class SlackBukkit extends JavaPlugin implements Listener {
     }
     
     private void send(String message, Player player, boolean useMarkdown) {
-        new BukkitPoster(message, player, useMarkdown).runTaskAsynchronously(this);
+        slackPoster.addMessage(new SlackMessage(message, player.getName(),useMarkdown));
     }
 
     private boolean isAllowed(String command) {
@@ -110,11 +115,11 @@ public class SlackBukkit extends JavaPlugin implements Listener {
         if (!sender.hasPermission("slack.command")) {
             sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
         } else if (args.length == 0) {
-            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
         } else if (args[0].equalsIgnoreCase("reload")) {
             if (sender.hasPermission("slack.command")) {
                 reloadConfig();
-                webhookUrl = getConfig().getString("webhook");
+                slackPoster.setWebhookUrl(getConfig().getString("webhook"));
                 blacklist = getConfig().getStringList("blacklist");
                 sender.sendMessage(ChatColor.GREEN + "Slack has been reloaded.");
                 if (!(sender instanceof ConsoleCommandSender)) {
@@ -125,12 +130,12 @@ public class SlackBukkit extends JavaPlugin implements Listener {
             }
         } else if (args[0].equalsIgnoreCase("send")) {
             if (sender.hasPermission("slack.command")) {
-                if (args.length <= 3) {
-                    sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message>");
-                } else if (args.length >= 4) {
+                if (args.length <= 2) {
+                    sender.sendMessage(ChatColor.GOLD + "/slack send <username> <message>");
+                } else if (args.length >= 3) {
                     StringBuilder sb = new StringBuilder();
                     boolean first = true;
-                    for (int i = 3; i < args.length; i++) {
+                    for (int i = 2; i < args.length; i++) {
                         if (first) {
                             first = false;
                         } else {
@@ -146,21 +151,19 @@ public class SlackBukkit extends JavaPlugin implements Listener {
                     }
                     sb.append(MessageFormat.format(" (sent by {0})", senderName));
                     if (args[2].equalsIgnoreCase("null")) {
-                        new BukkitPoster(sb.toString(), args[1], "https://cravatar.eu/helmhead/" + getServer().getPlayer(args[1]).getUniqueId() + "/128.png", false).runTaskAsynchronously(this);
-                    } else {
-                        new BukkitPoster(sb.toString(), args[1], args[2], false).runTaskAsynchronously(this);
-                    } 
+                        slackPoster.addMessage(new SlackMessage(sb.toString(), args[1], true));
+                    }
                 }
             } else {
                 sender.sendMessage(ChatColor.DARK_RED + "You are not allowed to execute this command!");
             }
         } else {
-            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <image URL or null for username's skin> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
+            sender.sendMessage(ChatColor.GOLD + "/slack send <username> <message> - send a custom message to slack\n/slack reload - reload Slack's config");
         }
         return true;
     }
 
-    public static String getWebhookUrl() {
-        return webhookUrl;
+    public SlackPoster getSlackPoster() {
+        return slackPoster;
     }
 }

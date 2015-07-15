@@ -6,7 +6,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ComponentBuilder;
 import net.md_5.bungee.api.plugin.Command;
-import org.circuitsoft.slack.api.BungeePoster;
+import org.circuitsoft.slack.api.SlackMessage;
 
 public class SlackBungeeCommand extends Command {
 
@@ -40,12 +40,12 @@ public class SlackBungeeCommand extends Command {
             }
         } else if (args[0].equals("send")) {
             if (sender.hasPermission("slack.command")) {
-                if (args.length <= 3) {
+                if (args.length <= 2) {
                     sender.sendMessage(sendHelpMsg);
-                } else if (args.length >= 4) {
+                } else if (args.length >= 3) {
                     StringBuilder sb = new StringBuilder();
                     boolean first = true;
-                    for (int i = 3; i < args.length; i++) {
+                    for (int i = 2; i < args.length; i++) {
                         if (first) {
                             first = false;
                         } else {
@@ -53,11 +53,7 @@ public class SlackBungeeCommand extends Command {
                         }
                         sb.append(args[i]);
                     }
-                    if (args[2].equalsIgnoreCase("null")) {
-                        plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(sb.toString(), args[1], "https://cravatar.eu/helmhead/" + plugin.getProxy().getPlayer(args[1]).getUniqueId() + "/128.png", false));
-                    } else {
-                        plugin.getProxy().getScheduler().runAsync(plugin, new BungeePoster(sb.toString(), args[1], args[2], false));
-                    }
+                    plugin.getSlackPoster().addMessage(new SlackMessage(sb.toString(), args[1], true));
                 }
             } else {
                 sender.sendMessage(noPermMsg);
