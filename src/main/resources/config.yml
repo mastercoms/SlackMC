@@ -25,9 +25,9 @@ channels:
     # The name of the channel
     default:
         # The incoming webhook (required for default)
-        incoming-webhook: 
+        incoming-webhook: ''
         # The outgoing webhook (required when receiving Slack messages)
-        outgoing-webhook: 
+        outgoing-webhook: ''
         # What sources should be classified for handling for this channel
         # When using Bukkit, the default source type is a world. Example:
         # source: world

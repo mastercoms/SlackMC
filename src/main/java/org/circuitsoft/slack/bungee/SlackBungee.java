@@ -16,13 +16,14 @@ import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import org.circuitsoft.slack.api.BungeePoster;
+import org.circuitsoft.slack.api.SlackMessage;
+import org.circuitsoft.slack.api.SlackPoster;
 
 public class SlackBungee extends Plugin implements Listener {
 
-    private static String webhookUrl;
     private List<String> blacklist;
     private Configuration config;
+    private SlackPoster slackPoster;
 
     @Override
     public void onEnable() {
@@ -35,11 +36,15 @@ public class SlackBungee extends Plugin implements Listener {
             getLogger().log(Level.SEVERE, "config.yml does not exist: ", ex);
         }
         updateConfig(this.getDescription().getVersion());
-        webhookUrl = config.getString("webhook");
+        //todo: add more webhooks to SlackPoster
+        String webhookUrl = config.getString("channels.default.incoming-webhook");
         blacklist = config.getStringList("blacklist");
         if (webhookUrl == null || webhookUrl.trim().isEmpty() || webhookUrl.equals("https://hooks.slack.com/services/")) {
             getLogger().severe("You have not set your webhook URL in the config!");
+            return;
         }
+        this.slackPoster = new SlackPoster(webhookUrl);
+        getProxy().getScheduler().runAsync(this, slackPoster);
     }
 
     public void reloadConfig() {
@@ -48,7 +53,7 @@ public class SlackBungee extends Plugin implements Listener {
         } catch (IOException ex) {
             getLogger().log(Level.SEVERE, "config.yml does not exist: ", ex);
         }
-        webhookUrl = config.getString("webhook");
+        slackPoster.setWebhookUrl(config.getString("webhook"));
         blacklist = config.getStringList("blacklist");
     }
 
@@ -82,7 +87,7 @@ public class SlackBungee extends Plugin implements Listener {
     }
 
     private void send(String message, ProxiedPlayer player, String serverName, boolean useMarkdown) {
-        getProxy().getScheduler().runAsync(this, new BungeePoster(message, player, serverName, useMarkdown));
+        slackPoster.addMessage(new SlackMessage(message, player.getName(), serverName, useMarkdown));
     }
 
     private boolean isAllowed(String command) {
@@ -130,7 +135,7 @@ public class SlackBungee extends Plugin implements Listener {
         }
     }
 
-    public static String getWebhookUrl() {
-        return webhookUrl;
+    public SlackPoster getSlackPoster() {
+        return slackPoster;
     }
 }
