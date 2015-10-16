@@ -1,9 +1,18 @@
 package org.circuitsoft.slackmc.api.bukkit;
 
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.eclipse.jetty.server.Server;
 
+import java.util.logging.Level;
+
 public class SlackReceiveServer extends BukkitRunnable {
+
+    JavaPlugin plugin;
+
+    protected  SlackReceiveServer (JavaPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @Override
     public void run() {
@@ -12,7 +21,8 @@ public class SlackReceiveServer extends BukkitRunnable {
         try {
             server.start();
             server.join();
-        } catch (Exception ignored) {
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Error in starting SlackMC server: " + e);
         }
     }
 }

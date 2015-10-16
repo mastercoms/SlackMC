@@ -13,6 +13,6 @@ public class SlackBukkit extends JavaPlugin implements Listener {
 
     @Override
     public void onEnable() {
-        getServer().getScheduler().runTaskAsynchronously(this, new SlackReceiveServer());
+        getServer().getScheduler().runTaskAsynchronously(this, new SlackReceiveServer(this));
     }
 }
