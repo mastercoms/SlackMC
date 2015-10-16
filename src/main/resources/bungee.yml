@@ -1,4 +1,0 @@
-name: Slack
-main: org.circuitsoft.slack.bungee.SlackBungee
-version: 1.4.4
-author: CircuitSoft
