@@ -1,0 +1,6 @@
+name: SlackMC
+version: 2.0.0
+description: Link your Minecraft server to Slack!
+author: mastercoms
+website: https://github.com/CircuitSoftGroup/SlackMC
+main: org.circuitsoft.slackmc.plugin.bukkit.Slack

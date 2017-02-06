@@ -1,0 +1,11 @@
+outgoing:
+  example:
+    webhook: 'https://hooks.slack.com/services/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'
+    channel: 'general'
+    unfurlLinks: true
+    format: '{0} has joined the game!'
+    event: 'chat'
+    filters:
+      world:
+        blacklist: true
+        filter: world
