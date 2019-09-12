@@ -10,7 +10,9 @@ Link [Slack](https://slack.com) to Minecraft!
 
 ## Download
 
-[Direct download](https://github.com/CircuitSoftGroup/SlackMC/releases)
+* [Direct download](https://github.com/CircuitSoftGroup/SlackMC/releases)
+* [SpigotMC](https://www.spigotmc.org/resources/slack.2103/)
+* [BukkitDev](https://dev.bukkit.org/projects/slack)
 
 ## Installation
 Put either the API jar or the plugin jar into your plugins folder. If you only want to use Slack on demand using the API, use the API jar. If you want the API features, access to the API using commands, and the logging and remote console features, use the plugin jar.
